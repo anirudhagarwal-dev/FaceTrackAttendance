@@ -16,7 +16,7 @@ class FaceMatch:
     """Represents a face match result."""
     name: str
     confidence: float
-    location: Tuple[int, int, int, int]  # (top, right, bottom, left)
+    location: Tuple[int, int, int, int] 
 
 
 class FaceRecognizer:
@@ -27,7 +27,6 @@ class FaceRecognizer:
     - Matching detected faces with known encodings
     """
 
-    # Supported image formats
     SUPPORTED_FORMATS = ('.jpg', '.jpeg', '.png', '.bmp', '.gif')
 
     def __init__(
@@ -48,11 +47,9 @@ class FaceRecognizer:
         self.tolerance = tolerance
         self.model = model
         
-        # Storage for known faces
         self.known_encodings: List[np.ndarray] = []
         self.known_names: List[str] = []
         
-        # Cache for performance
         self._encoding_cache: Dict[str, np.ndarray] = {}
 
     def load_dataset(self) -> int:
