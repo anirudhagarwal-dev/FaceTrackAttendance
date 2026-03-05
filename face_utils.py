@@ -77,19 +77,15 @@ class FaceRecognizer:
         
         student_count = 0
         
-        # Iterate through each student folder
         for student_name in os.listdir(self.dataset_path):
             student_folder = os.path.join(self.dataset_path, student_name)
             
-            # Skip if not a directory
             if not os.path.isdir(student_folder):
                 continue
             
-            # Load encodings for this student
             encodings = self._load_student_encodings(student_name, student_folder)
             
             if encodings:
-                # Add all encodings for this student
                 for encoding in encodings:
                     self.known_encodings.append(encoding)
                     self.known_names.append(student_name)
@@ -120,17 +116,14 @@ class FaceRecognizer:
         encodings = []
         
         for filename in os.listdir(folder_path):
-            # Check if file is an image
             if not filename.lower().endswith(self.SUPPORTED_FORMATS):
                 continue
             
             image_path = os.path.join(folder_path, filename)
             
             try:
-                # Load image
                 image = face_recognition.load_image_file(image_path)
-                
-                # Get face encodings
+            
                 face_encodings = face_recognition.face_encodings(image)
                 
                 if face_encodings:
