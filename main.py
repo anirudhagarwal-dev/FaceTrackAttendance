@@ -29,7 +29,6 @@ import pandas as pd
 from datetime import datetime
 from typing import Set, Optional
 
-# Import project modules
 from face_utils import FaceRecognizer, draw_face_box, draw_status_bar, FaceMatch
 from database import AttendanceDatabase
 
@@ -65,25 +64,21 @@ class AttendanceSystem:
         self.resize_factor = resize_factor
         self.process_every_n_frames = process_every_n_frames
         
-        # Ensure directories exist
         os.makedirs(dataset_path, exist_ok=True)
         os.makedirs(attendance_folder, exist_ok=True)
         
-        # Initialize face recognizer
         print("[INFO] Initializing face recognizer...")
         self.recognizer = FaceRecognizer(
             dataset_path=dataset_path,
             tolerance=tolerance,
-            model="hog"  # Use 'cnn' for GPU acceleration
+            model="hog" 
         )
         
-        # Initialize database
         print("[INFO] Initializing database...")
         self.db = AttendanceDatabase(
             db_path=os.path.join(attendance_folder, "attendance.db")
         )
         
-        # CSV file path (daily)
         self.csv_path = self._get_csv_path()
         
         # Track marked students for this session
