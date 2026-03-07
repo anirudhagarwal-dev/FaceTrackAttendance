@@ -81,13 +81,10 @@ class AttendanceSystem:
         
         self.csv_path = self._get_csv_path()
         
-        # Track marked students for this session
         self.marked_today: Set[str] = set()
         
-        # Video capture
         self.cap: Optional[cv2.VideoCapture] = None
         
-        # Performance tracking
         self.frame_count = 0
         self.fps = 0.0
         self.fps_start_time = time.time()
@@ -130,33 +127,26 @@ class AttendanceSystem:
         Returns:
             True if attendance was marked, False if already marked
         """
-        # Skip unknown faces
         if name == "Unknown":
             return False
         
-        # Check if already marked in this session
         if name in self.marked_today:
             return False
         
-        # Check database for duplicate
         if self.db.is_already_marked(name):
             self.marked_today.add(name)
             return False
         
-        # Get current timestamp
         now = datetime.now()
         date_str = now.strftime("%Y-%m-%d")
         time_str = now.strftime("%H:%M:%S")
         
-        # Mark in database
         self.db.mark_attendance(name, confidence)
         
-        # Write to CSV
         with open(self.csv_path, 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerow([name, date_str, time_str, f"{confidence:.4f}"])
         
-        # Add to session tracking
         self.marked_today.add(name)
         
         print(f"[ATTENDANCE] Marked: {name} at {time_str} (Confidence: {confidence*100:.1f}%)")
@@ -168,7 +158,6 @@ class AttendanceSystem:
         print("  FACE RECOGNITION ATTENDANCE SYSTEM")
         print("="*60 + "\n")
         
-        # Load dataset
         student_count = self.recognizer.load_dataset()
         
         if student_count == 0:
@@ -177,11 +166,9 @@ class AttendanceSystem:
             print("[INFO] Structure: dataset/StudentName/image1.jpg")
             print("\n[INFO] Starting anyway for testing...")
         
-        # Initialize CSV and load existing attendance
         self._initialize_csv()
         self._load_marked_today()
         
-        # Initialize camera
         print(f"\n[INFO] Opening camera (index: {self.camera_index})...")
         self.cap = cv2.VideoCapture(self.camera_index)
         
@@ -190,7 +177,6 @@ class AttendanceSystem:
             print("[INFO] Try changing camera_index in main() or check camera connection")
             return
         
-        # Set camera properties for better performance
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
         self.cap.set(cv2.CAP_PROP_FPS, 30)
@@ -202,7 +188,6 @@ class AttendanceSystem:
         print("  - Press 's' to show today's attendance")
         print("\n" + "-"*60 + "\n")
         
-        # Run main loop
         try:
             self._main_loop()
         except KeyboardInterrupt:
@@ -223,29 +208,24 @@ class AttendanceSystem:
             
             self.frame_count += 1
             
-            # Process face recognition every N frames for performance
             if self.frame_count % self.process_every_n_frames == 0:
                 last_matches = self.recognizer.detect_and_recognize(
                     frame, 
                     resize_factor=self.resize_factor
                 )
                 
-                # Mark attendance for recognized faces
                 for match in last_matches:
                     if match.name != "Unknown":
                         self.mark_attendance(match.name, match.confidence)
             
-            # Draw face boxes
             for match in last_matches:
                 frame = draw_face_box(frame, match, show_confidence=True)
             
-            # Calculate and display FPS
             if self.frame_count % 30 == 0:
                 elapsed = time.time() - self.fps_start_time
                 self.fps = 30 / elapsed if elapsed > 0 else 0
                 self.fps_start_time = time.time()
             
-            # Draw status bar
             frame = draw_status_bar(
                 frame,
                 student_count=self.recognizer.get_student_count(),
@@ -253,10 +233,8 @@ class AttendanceSystem:
                 fps=self.fps
             )
             
-            # Display frame
             cv2.imshow("Face Recognition Attendance", frame)
             
-            # Handle keyboard input
             key = cv2.waitKey(1) & 0xFF
             
             if key == ord('q'):
@@ -295,7 +273,6 @@ class AttendanceSystem:
         cv2.destroyAllWindows()
         self.db.close()
         
-        # Print session summary
         print("\n" + "="*60)
         print("  SESSION SUMMARY")
         print("="*60)
@@ -334,17 +311,15 @@ def export_attendance_report(
 
 def main():
     """Main entry point."""
-    # Configuration
     CONFIG = {
         "dataset_path": "dataset",
         "attendance_folder": "attendance",
-        "camera_index": 1,           # Change if using external camera
-        "tolerance": 0.6,            # Lower = stricter matching
-        "resize_factor": 0.25,       # Lower = faster but less accurate
-        "process_every_n_frames": 2  # Higher = faster but less responsive
+        "camera_index": 1,
+        "tolerance": 0.6, 
+        "resize_factor": 0.25, 
+        "process_every_n_frames": 2 
     }
     
-    # Check for command line arguments
     if len(sys.argv) > 1:
         if sys.argv[1] == "--help" or sys.argv[1] == "-h":
             print("""
@@ -367,7 +342,6 @@ Adding Students:
             return
         
         elif sys.argv[1] == "--export":
-            # Export last week's attendance
             from datetime import timedelta
             today = datetime.now()
             week_ago = today - timedelta(days=7)
@@ -379,7 +353,6 @@ Adding Students:
             )
             return
     
-    # Start the attendance system
     system = AttendanceSystem(**CONFIG)
     system.start()
 
