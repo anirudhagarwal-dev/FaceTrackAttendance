@@ -314,16 +314,13 @@ def draw_face_box(
     # Choose color based on recognition status
     box_color = unknown_color if name == "Unknown" else color
     
-    # Draw rectangle around face
     cv2.rectangle(frame, (left, top), (right, bottom), box_color, thickness)
     
-    # Prepare label
     if show_confidence and name != "Unknown":
         label = f"{name} ({confidence*100:.1f}%)"
     else:
         label = name
     
-    # Calculate label size
     font = cv2.FONT_HERSHEY_SIMPLEX
     font_scale = 0.6
     label_thickness = 1
@@ -331,7 +328,6 @@ def draw_face_box(
         label, font, font_scale, label_thickness
     )
     
-    # Draw label background
     cv2.rectangle(
         frame,
         (left, bottom),
@@ -340,7 +336,6 @@ def draw_face_box(
         cv2.FILLED
     )
     
-    # Draw label text
     cv2.putText(
         frame,
         label,
@@ -374,12 +369,10 @@ def draw_status_bar(
     """
     height, width = frame.shape[:2]
     
-    # Draw semi-transparent background
     overlay = frame.copy()
     cv2.rectangle(overlay, (0, 0), (width, 35), (50, 50, 50), cv2.FILLED)
     cv2.addWeighted(overlay, 0.7, frame, 0.3, 0, frame)
     
-    # Draw status text
     font = cv2.FONT_HERSHEY_SIMPLEX
     status_text = f"Students: {student_count} | Marked Today: {attendance_count} | FPS: {fps:.1f} | Press 'q' to quit"
     
@@ -397,7 +390,6 @@ def draw_status_bar(
 
 
 if __name__ == "__main__":
-    # Test the face recognition module
     print("Testing Face Recognition Module...")
     
     recognizer = FaceRecognizer(dataset_path="dataset")
