@@ -127,7 +127,6 @@ class FaceRecognizer:
                 face_encodings = face_recognition.face_encodings(image)
                 
                 if face_encodings:
-                    # Use the first face found
                     encodings.append(face_encodings[0])
                 else:
                     print(f"[WARNING] No face found in: {image_path}")
@@ -157,7 +156,6 @@ class FaceRecognizer:
         if not self.known_encodings:
             return matches
         
-        # Resize frame for faster processing
         small_frame = cv2.resize(
             frame, 
             (0, 0), 
@@ -165,10 +163,8 @@ class FaceRecognizer:
             fy=resize_factor
         )
         
-        # Convert BGR to RGB (face_recognition uses RGB)
         rgb_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
         
-        # Detect face locations
         face_locations = face_recognition.face_locations(
             rgb_frame, 
             model=self.model
@@ -177,7 +173,7 @@ class FaceRecognizer:
         if not face_locations:
             return matches
         
-        # Get face encodings
+
         face_encodings = face_recognition.face_encodings(
             rgb_frame, 
             face_locations
