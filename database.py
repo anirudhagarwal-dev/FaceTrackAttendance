@@ -22,7 +22,6 @@ class AttendanceDatabase:
         Args:
             db_path: Path to the SQLite database file
         """
-        # Ensure directory exists
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         
         self.db_path = db_path
@@ -41,7 +40,6 @@ class AttendanceDatabase:
         conn = self._get_connection()
         cursor = conn.cursor()
         
-        # Create attendance table
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS attendance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +52,6 @@ class AttendanceDatabase:
             )
         """)
         
-        # Create students table for reference
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS students (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,7 +112,6 @@ class AttendanceDatabase:
         if time is None:
             time = now.strftime("%H:%M:%S")
         
-        # Check if already marked
         if self.is_already_marked(name, date):
             return False
         
@@ -130,7 +126,6 @@ class AttendanceDatabase:
             conn.commit()
             return True
         except sqlite3.IntegrityError:
-            # Duplicate entry
             return False
 
     def get_attendance_by_date(self, date: str) -> List[Tuple]:
@@ -258,27 +253,22 @@ class AttendanceDatabase:
         self.close()
 
 
-# Convenience functions for standalone usage
 def get_database(db_path: str = "attendance/attendance.db") -> AttendanceDatabase:
     """Get a database instance."""
     return AttendanceDatabase(db_path)
 
 
 if __name__ == "__main__":
-    # Test the database module
     db = AttendanceDatabase()
     
-    # Test marking attendance
     print("Testing database operations...")
     
     result = db.mark_attendance("Test Student", confidence=0.95)
     print(f"Mark attendance: {'Success' if result else 'Already exists'}")
     
-    # Try marking again (should fail)
     result = db.mark_attendance("Test Student")
     print(f"Mark again: {'Success' if result else 'Already exists (expected)'}")
     
-    # Get today's attendance
     today = datetime.now().strftime("%Y-%m-%d")
     records = db.get_attendance_by_date(today)
     print(f"\nToday's attendance ({today}):")
