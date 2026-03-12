@@ -179,9 +179,7 @@ class FaceRecognizer:
             face_locations
         )
         
-        # Process each detected face
         for face_encoding, face_location in zip(face_encodings, face_locations):
-            # Scale location back to original size
             top, right, bottom, left = face_location
             scale = int(1 / resize_factor)
             scaled_location = (
@@ -191,7 +189,6 @@ class FaceRecognizer:
                 left * scale
             )
             
-            # Find best match
             name, confidence = self._find_best_match(face_encoding)
             
             matches.append(FaceMatch(
@@ -218,20 +215,16 @@ class FaceRecognizer:
         if not self.known_encodings:
             return ("Unknown", 0.0)
         
-        # Calculate face distances
         face_distances = face_recognition.face_distance(
             self.known_encodings, 
             face_encoding
         )
         
-        # Find best match
         best_match_index = np.argmin(face_distances)
         best_distance = face_distances[best_match_index]
         
-        # Check if within tolerance
         if best_distance <= self.tolerance:
             name = self.known_names[best_match_index]
-            # Convert distance to confidence (0-1, higher is better)
             confidence = 1.0 - best_distance
             return (name, confidence)
         
@@ -307,7 +300,6 @@ def draw_face_box(
     name = face_match.name
     confidence = face_match.confidence
     
-    # Choose color based on recognition status
     box_color = unknown_color if name == "Unknown" else color
     
     cv2.rectangle(frame, (left, top), (right, bottom), box_color, thickness)
