@@ -387,3 +387,5 @@ if __name__ == "__main__":
     print(f"Student names: {recognizer.get_student_names()}")
     print(f"Total encodings: {recognizer.get_encoding_count()}")
     print("\nFace recognition module test completed!")
+
+//final
