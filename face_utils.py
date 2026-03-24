@@ -344,7 +344,7 @@ def draw_status_bar(
     fps: float = 0.0
 ) -> np.ndarray:
     """
-    Draw a status bar at the top of the frame.
+    Draw a status bar at the top of the frame. //status bar
     
     Args:
         frame: BGR image
